@@ -1,0 +1,66 @@
+use std::str::FromStr;
+use ast::{Expr, Opcode, Input};
+
+grammar;
+
+pub EquExpr: Input = {
+    <a:Variable> r"\s*=\s*" <b:Expr> => Input::Assignation(
+        Box::new(Expr::Variable(a)), b),
+    <Func> r"\s*=\s*" <Expr> => Input::Assignation(<>),
+    <Expr> r"\s*=\s*\?\s*" => Input::Eval(<>),
+};
+
+Expr: Box<Expr> = {
+    Expr ExprOp Factor => Box::new(Expr::Op(<>)),
+    Factor,
+};
+
+ExprOp: Opcode = { // lvl 3
+    "+" => Opcode::Add,
+    "-" => Opcode::Sub,
+};
+
+Factor: Box<Expr> = {
+    Factor FactorOp Power => Box::new(Expr::Op(<>)),
+    Power,
+}
+
+FactorOp: Opcode = { // lvl 2
+    "*" => Opcode::Mult,
+    "/" => Opcode::Div,
+    "%" => Opcode::Rem,
+};
+
+Power: Box<Expr> = {
+    Term PowerOp Power => Box::new(Expr::Op(<>)),
+    Term,
+};
+
+PowerOp: Opcode = { // lvl 1
+    "^" => Opcode::Pow,
+};
+
+Term: Box<Expr> = {
+    Num => Box::new(Expr::Number(<>)),
+    Imaginary => Box::new(Expr::Imaginary),
+    Variable => Box::new(Expr::Variable(<>)),
+    Func,
+    "(" <Expr> ")"
+};
+
+Imaginary: Box<Expr> = {
+    "i" => Box::new(Expr::Imaginary),
+    "I" => Box::new(Expr::Imaginary),
+};
+
+Func: Box<Expr> = {
+    <Variable> "(" <Expr> ")" => Box::new(Expr::Function(<>)),
+}
+
+Variable: String = {
+    r"[[:alpha:]]+[[:alnum:]]+|[A-HJ-Za-hj-z]{1}" => String::from(<>),
+};
+
+Num: f32 = {
+    r"[0-9]+(\.[0-9]+)?" => f32::from_str(<>).unwrap(),
+};
