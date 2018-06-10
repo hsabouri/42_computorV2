@@ -4,8 +4,7 @@ use ast::{Expr, Opcode, Input};
 grammar;
 
 pub EquExpr: Input = {
-    <a:Variable> r"\s*=\s*" <b:Expr> => Input::Assignation(
-        Box::new(Expr::Variable(a)), b),
+    <a:Variable> r"\s*=\s*" <b:Expr> => Input::Assignation(Box::new(Expr::Variable(a)), b),
     <Func> r"\s*=\s*" <Expr> => Input::Assignation(<>),
     <Expr> r"\s*=\s*\?\s*" => Input::Eval(<>),
 };
@@ -26,7 +25,7 @@ Factor: Box<Expr> = {
 }
 
 FactorOp: Opcode = { // lvl 2
-    "*" => Opcode::Mult,
+    "*" => Opcode::Mul,
     "/" => Opcode::Div,
     "%" => Opcode::Rem,
 };

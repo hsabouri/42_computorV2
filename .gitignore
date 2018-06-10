@@ -7,3 +7,5 @@ Cargo.lock
 **/*.rs.bk
 
 src/parser.rs
+
+computor_history
