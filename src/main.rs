@@ -3,6 +3,11 @@ extern crate rustyline;
 mod parser;
 mod solver;
 mod ast;
+mod add_override;
+mod sub_override;
+mod mul_override;
+mod div_override;
+mod rem_override;
 
 use solver::Solver;
 use ast::Input;
@@ -27,7 +32,10 @@ fn main() {
     let mut reader = Editor::<()>::new();
     let mut solver = Solver::new();
 
-    reader.load_history("computor_history");
+    match reader.load_history("computor_history") {
+        Ok(_) => println!("history loaded"),
+        Err(_) => println!("no history found")
+    };
     loop {
         match reader.readline("computor > ") {
             Ok(line) => {

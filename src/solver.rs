@@ -1,5 +1,6 @@
 use std::collections::HashMap;
-use ast::{Expr, Opcode};
+use std::f32;
+use ast::*;
 
 pub struct Solver {
     vars: HashMap<String, Expr>,
@@ -17,6 +18,13 @@ impl Solver {
         let res = match expr {
             Expr::Number(_) => Ok(expr),
             Expr::Imaginary => Ok(expr),
+            Expr::Complex(a, b) => {
+                if b < 0.0 + f32::EPSILON && b > 0.0 - f32::EPSILON {
+                    Ok(Expr::Number(a))
+                } else {
+                    Ok(expr)
+                }
+            },
             Expr::Matrix(_) => Ok(expr), //TODO
             Expr::Variable(s) => match self.vars.get(&s.to_lowercase()).cloned() {
                 Some(value) => Ok(value),

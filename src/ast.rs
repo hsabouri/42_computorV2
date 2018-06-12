@@ -1,5 +1,4 @@
 use std::f32;
-use std::ops::{Add, Sub, Mul, Div, Rem};
 use std::fmt;
 
 #[derive(Copy, Clone)]
@@ -48,6 +47,7 @@ pub enum Input {
 pub enum Expr {
     Number(f32),
     Imaginary,
+    Complex(f32, f32),
     Matrix(Vec<Vec<Expr>>),
     Variable(String),
     Function(String, Box<Expr>),
@@ -55,10 +55,15 @@ pub enum Expr {
 }
 
 impl Expr {
-    fn operation_error(self, op: Opcode) -> String {
+    pub fn type_error(left: Expr, right: Expr, op: Opcode) -> String {
+        format!("Solve this regression you dumb")
+    }
+
+    pub fn operation_error(self, op: Opcode) -> String {
         match self {
             Expr::Number(_) => format!("Can't {:?} on numbers", op),
-            Expr::Imaginary => format!("Can't {:?} on complex numbers", op),
+            Expr::Imaginary => format!("Can't {:?} on imaginary number", op),
+            Expr::Complex(_, _) => format!("Can't {:?} on complex numbers", op),
             Expr::Matrix(_) => format!("Can't {:?} on matrices", op),
             Expr::Variable(_) => format!("Can't {:?} on raw variables", op),
             Expr::Function(_, _) => format!("Can't {:?} on raw functions", op),
@@ -76,87 +81,12 @@ impl Expr {
         }
     }
 }
-
-impl Add for Expr {
-    type Output = Result<Expr, String>;
-
-    fn add(self, other: Expr) -> Result<Expr, String> {
-        match self {
-            Expr::Number(a) => match other {
-                Expr::Number(b) => Ok(Expr::Number(a + b)),
-                b => Err(b.operation_error(Opcode::Add))
-            },
-            a => Err(a.operation_error(Opcode::Add))
-        }
-    }
-}
-
-impl Sub for Expr {
-    type Output = Result<Expr, String>;
-
-    fn sub(self, other: Expr) -> Result<Expr, String> {
-        match self {
-            Expr::Number(a) => match other {
-                Expr::Number(b) => Ok(Expr::Number(a - b)),
-                b => Err(b.operation_error(Opcode::Sub))
-            },
-            a => Err(a.operation_error(Opcode::Sub))
-        }
-    }
-}
-
-impl Mul for Expr {
-    type Output = Result<Expr, String>;
-
-    fn mul(self, other: Expr) -> Result<Expr, String> {
-        match self {
-            Expr::Number(a) => match other {
-                Expr::Number(b) => Ok(Expr::Number(a * b)),
-                b => Err(b.operation_error(Opcode::Mul))
-            },
-            a => Err(a.operation_error(Opcode::Mul))
-        }
-    }
-}
-
-impl Div for Expr {
-    type Output = Result<Expr, String>;
-
-    fn div(self, other: Expr) -> Result<Expr, String> {
-        match self {
-            Expr::Number(a) => match other {
-                Expr::Number(b)
-                    if b >= 0.0 + f32::EPSILON &&
-                    b <= 0.0 - f32::EPSILON => Ok(Expr::Number(a / b)),
-                b => Err(b.operation_error(Opcode::Div))
-            },
-            a => Err(a.operation_error(Opcode::Div))
-        }
-    }
-}
-
-impl Rem for Expr {
-    type Output = Result<Expr, String>;
-
-    fn rem(self, other: Expr) -> Result<Expr, String> {
-        match self {
-            Expr::Number(a) => match other {
-                Expr::Number(b) if b >= 0.0 + f32::EPSILON || b <= 0.0 - f32::EPSILON => {
-                    let (a, b) = (a as i32, b as i32);
-
-                    Ok(Expr::Number((a % b) as f32))
-                },
-                b => Err(b.operation_error(Opcode::Rem))
-            },
-            a => Err(a.operation_error(Opcode::Rem))
-        }
-    }
-}
-
+  
 impl fmt::Display for Expr {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Expr::Number(ref a) => write!(f, "{}", a),
+            Expr::Complex(ref a, ref b) => write!(f, "{} {}i", a, b),
             Expr::Imaginary => write!(f, "i"),
             Expr::Matrix(_) => write!(f, "[...]"),
             Expr::Variable(ref s) => write!(f, "{}", s),
