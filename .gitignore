@@ -9,3 +9,5 @@ Cargo.lock
 src/parser.rs
 
 computor_history
+
+rls

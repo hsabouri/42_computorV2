@@ -25,6 +25,7 @@ impl Add for Expr {
             (Expr::Number(a), Expr::Number(b)) => Ok(Expr::Number(a + b)),
             (Expr::Number(a), Expr::Complex(ca, cb)) | (Expr::Complex(ca, cb), Expr::Number(a)) =>
                 add_number_complex(a, (ca, cb)),
+            (Expr::Complex(a, b), Expr::Complex(x, y)) => add_complex_complex((a, b), (x, y)),
             (Expr::Number(a), Expr::Imaginary) | (Expr::Imaginary, Expr::Number(a)) =>
                 add_number_imaginary(a),
             (Expr::Complex(ca, cb), Expr::Imaginary) | (Expr::Imaginary, Expr::Complex(ca, cb)) =>

@@ -1,6 +1,12 @@
 use std::f32;
 use std::fmt;
 
+pub trait Pow<RHS=Self> {
+    type Output;
+
+    fn pow(self, rhs: RHS) -> Self::Output;
+}
+
 #[derive(Copy, Clone)]
 pub enum Opcode {
     Add,
@@ -56,7 +62,26 @@ pub enum Expr {
 
 impl Expr {
     pub fn type_error(left: Expr, right: Expr, op: Opcode) -> String {
-        format!("Solve this regression you dumb")
+        format!("Can't {:?} {} with {}", op,
+            match left {
+                Expr::Number(_) => format!("number ({})", left),
+                Expr::Imaginary => format!("complex ({})", left),
+                Expr::Complex(_, _) => format!("complex ({})", left),
+                Expr::Matrix(_) => format!("matrice ({})", left),
+                Expr::Variable(_) => format!("variable ({})", left),
+                Expr::Function(_, _) => format!("function ({})", left),
+                Expr::Op(_, _, _) => format!("expression ({})", left),
+            },
+            match right {
+                Expr::Number(_) => format!("number ({})", right),
+                Expr::Imaginary => format!("complex ({})", right),
+                Expr::Complex(_, _) => format!("complex ({})", right),
+                Expr::Matrix(_) => format!("matrice ({})", right),
+                Expr::Variable(_) => format!("variable ({})", right),
+                Expr::Function(_, _) => format!("function ({})", right),
+                Expr::Op(_, _, _) => format!("expression ({})", right),
+            }
+        )
     }
 
     pub fn operation_error(self, op: Opcode) -> String {
@@ -70,23 +95,19 @@ impl Expr {
             Expr::Op(_, _, _) => format!("Can't {:?} on raw exprs", op),
         }
     }
-
-    pub fn pow(self, other: Expr) -> Result<Expr, String> {
-        match self {
-            Expr::Number(a) => match other {
-                Expr::Number(b) => Ok(Expr::Number(a.powf(b))),
-                b => Err(b.operation_error(Opcode::Add))
-            },
-            a => Err(a.operation_error(Opcode::Add))
-        }
-    }
 }
   
 impl fmt::Display for Expr {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Expr::Number(ref a) => write!(f, "{}", a),
-            Expr::Complex(ref a, ref b) => write!(f, "{} {}i", a, b),
+            Expr::Complex(ref a, ref b) => {
+                if *b < 0.0 - f32::EPSILON {
+                    write!(f, "{} {}i", a, b)
+                } else {
+                    write!(f, "{} + {}i", a, b)
+                }
+            },
             Expr::Imaginary => write!(f, "i"),
             Expr::Matrix(_) => write!(f, "[...]"),
             Expr::Variable(ref s) => write!(f, "{}", s),

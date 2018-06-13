@@ -1,23 +1,36 @@
 use ast::{Expr, Opcode};
 use std::ops::Div;
+use std::f32;
 
 fn div_number_complex(a: f32, c: (f32, f32)) -> Result<Expr, String> {
     let squared = c.0 * c.0 - c.1 * c.1;
 
-    Ok(Expr::Complex((a * c.0) / squared, -(a * c.1) / squared))
+    if squared >= 0.0 - f32::EPSILON && squared <= 0.0 + f32::EPSILON {
+        Err(format!("Can't divide by 0"))
+    } else {
+        Ok(Expr::Complex((a * c.0) / squared, -(a * c.1) / squared))
+    }
 }
 
 fn div_complex_number(n: f32, c: (f32, f32)) -> Result<Expr, String> {
-    Ok(Expr::Complex(c.0 / n, c.1 / n))
+    if n >= 0.0 - f32::EPSILON && n <= 0.0 + f32::EPSILON {
+        Err(format!("Can't divide by 0"))
+    } else {
+        Ok(Expr::Complex(c.0 / n, c.1 / n))
+    }
 }
 
 fn div_complex_complex(c0: (f32, f32), c1: (f32, f32)) -> Result<Expr, String> {
     let squared = c1.0 * c1.0 + c1.1 * c1.1;
-
-    Ok(Expr::Complex(
-        (c0.0 * c1.0 + c0.1 + c1.1) / squared,
-        (c0.1 * c1.0 - c0.0 * c1.1) / squared
-    ))
+    
+    if squared >= 0.0 - f32::EPSILON && squared <= 0.0 + f32::EPSILON {
+        Err(format!("Can't divide by 0"))
+    } else {
+        Ok(Expr::Complex(
+            (c0.0 * c1.0 + c0.1 + c1.1) / squared,
+            (c0.1 * c1.0 - c0.0 * c1.1) / squared
+        ))
+    }
 }
 
 fn div_number_imaginary(n: f32) -> Result<Expr, String> {
@@ -25,17 +38,26 @@ fn div_number_imaginary(n: f32) -> Result<Expr, String> {
 }
 
 fn div_imaginary_number(n: f32) -> Result<Expr, String> {
-    Ok(Expr::Complex(0.0, 1.0 / n))
+    if n >= 0.0 - f32::EPSILON && n <= 0.0 + f32::EPSILON {
+        Err(format!("Can't divide by 0"))
+    } else {
+        Ok(Expr::Complex(0.0, 1.0 / n))
+    }
 }
 
 fn div_complex_imaginary(c: (f32, f32)) -> Result<Expr, String> {
+    
     Ok(Expr::Complex(c.1, - c.0))
 }
 
 fn div_imaginary_complex(c: (f32, f32)) -> Result<Expr, String> {
     let squared = c.0 * c.0 - c.1 * c.1;
-
-    Ok(Expr::Complex(c.1 / squared, c.0 / squared))
+    
+    if squared >= 0.0 - f32::EPSILON && squared <= 0.0 + f32::EPSILON {
+        Err(format!("Can't divide by 0"))
+    } else {
+        Ok(Expr::Complex(c.1 / squared, c.0 / squared))
+    }
 }
 
 impl Div for Expr {

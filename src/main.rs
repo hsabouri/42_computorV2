@@ -8,6 +8,7 @@ mod sub_override;
 mod mul_override;
 mod div_override;
 mod rem_override;
+mod pow_trait;
 
 use solver::Solver;
 use ast::Input;
