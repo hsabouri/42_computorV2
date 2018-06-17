@@ -19,11 +19,11 @@ fn parse(solver: &mut Solver, line: String) {
     match parser::EquExprParser::new().parse(&line) {
         Ok(Input::Assignation(left, right)) => match solver.assign(*left, *right) {
             Ok(expr) => println!("{}", expr),
-            Err(err) => println!("{}", err)
+            Err(err) => println!("{}", err),
         },
         Ok(Input::Eval(expr)) => match solver.eval(*expr) {
             Ok(expr) => println!("{}", expr),
-            Err(err) => println!("{}", err)
+            Err(err) => println!("{}", err),
         },
         Err(err) => println!("{}", err),
     };

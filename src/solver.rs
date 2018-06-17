@@ -14,8 +14,7 @@ impl Solver {
     }
 
     fn solve(&self, expr: Expr) -> Result<Expr, String> {
-        let cloned_expr = expr.clone();
-        let res = match expr {
+        match expr {
             Expr::Number(_) => Ok(expr),
             Expr::Imaginary => Ok(expr),
             Expr::Complex(a, b) => {
@@ -39,12 +38,7 @@ impl Solver {
                 Opcode::Rem => self.solve(*a)? % self.solve(*b)?,
                 Opcode::Pow => self.solve(*a)?.pow(self.solve(*b)?),
             },
-        };
-        match cloned_expr {
-            Expr::Number(_) => print!(""),
-            _ => println!("{} => {}", cloned_expr, res.clone().unwrap())
-        };
-        res
+        }
     }
 
     pub fn assign(&mut self, var: Expr, expr: Expr) -> Result<Expr, String> {
