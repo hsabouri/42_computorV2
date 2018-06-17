@@ -3,13 +3,21 @@ use std::f32;
 
 fn pow_complex_number(n: f32, c: Expr) -> Result<Expr, String> {
     let iterator = 0..(n as i32);
+    let sigma = Expr::Number(n - (n as i32) as f32);
     let mut res = Expr::Number(1.0);
 
     for _ in iterator {
-        res = (res * c.clone())?;
+        if n >= 0.0 {
+            res = (res * c.clone())?;
+        } else {
+            res = (res / c.clone())?;
+        }
     }
-    let sigma = Expr::Number(n - (n as i32) as f32);
-    Ok((res * (c * sigma)?)?)
+    if n >= 0.0 {
+        Ok((res * (c * sigma)?)?)
+    } else {
+        Ok((res / (c * sigma)?)?)
+    }
 }
 
 impl Pow for Expr {
