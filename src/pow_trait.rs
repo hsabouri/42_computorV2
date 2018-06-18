@@ -13,6 +13,7 @@ fn pow_complex_number(n: f32, c: Expr) -> Result<Expr, String> {
             res = (res / c.clone())?;
         }
     }
+    // TODO: Correct this monster
     if n >= 0.0 {
         Ok((res * (c * sigma)?)?)
     } else {
