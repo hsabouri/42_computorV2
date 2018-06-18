@@ -3,7 +3,6 @@ use std::f32;
 
 fn pow_complex_number(n: f32, c: Expr) -> Result<Expr, String> {
     let iterator = 0..(n as i32);
-    let sigma = Expr::Number(n - (n as i32) as f32);
     let mut res = Expr::Number(1.0);
 
     for _ in iterator {
@@ -13,12 +12,7 @@ fn pow_complex_number(n: f32, c: Expr) -> Result<Expr, String> {
             res = (res / c.clone())?;
         }
     }
-    // TODO: Correct this monster
-    if n >= 0.0 {
-        Ok((res * (c * sigma)?)?)
-    } else {
-        Ok((res / (c * sigma)?)?)
-    }
+	Ok(res)
 }
 
 impl Pow for Expr {
