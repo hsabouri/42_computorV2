@@ -54,7 +54,7 @@ pub enum Expr {
     Number(f32),
     Imaginary,
     Complex(f32, f32),
-    Matrix(Vec<Vec<Expr>>),
+    Matrix(Vec<Vec<Box<Expr>>>),
     Variable(String),
     Function(String, Box<Expr>),
     Op(Box<Expr>, Opcode, Box<Expr>)
@@ -109,7 +109,25 @@ impl fmt::Display for Expr {
                 }
             },
             Expr::Imaginary => write!(f, "i"),
-            Expr::Matrix(_) => write!(f, "[...]"),
+            Expr::Matrix(x) => {
+                write!(f, "[ ")?;
+                for (index, y) in x.iter().enumerate() {
+                    write!(f, "[")?;
+                    for (zindex, z) in y.iter().enumerate() {
+                        if zindex < y.len() - 1 {
+                            write!(f, "{}, ", z)?;
+                        } else {
+                            write!(f, "{}", z)?;
+                        }
+                    }
+                    if index < x.len() - 1 {
+                        write!(f, "] ; ")?;
+                    } else {
+                        write!(f, "]")?;
+                    }
+                }
+                write!(f, " ]")
+            },
             Expr::Variable(ref s) => write!(f, "{}", s),
             Expr::Function(ref s, ref e) => write!(f, "{}({})", s, *e),
             Expr::Op(ref a, ref o, ref b) => write!(f, "{} {} {}", a, o, b)

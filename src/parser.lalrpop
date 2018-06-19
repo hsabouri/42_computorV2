@@ -41,8 +41,9 @@ PowerOp: Opcode = { // lvl 1
 
 Term: Box<Expr> = {
     Num => Box::new(Expr::Number(<>)),
-    Imaginary => Box::new(Expr::Imaginary),
     Variable => Box::new(Expr::Variable(<>)),
+    Matrix => Box::new(Expr::Matrix(<>)),
+    Imaginary,
     Func,
     "(" <Expr> ")"
 };
@@ -52,9 +53,27 @@ Imaginary: Box<Expr> = {
     "I" => Box::new(Expr::Imaginary),
 };
 
+Matrix: Vec<Vec<Box<Expr>>> = {
+    "[" <begin:(<Vector> ";")*> <end:Vector> "]" => {
+        let mut vecvector = begin;
+
+        vecvector.push(end);
+        vecvector
+    }
+};
+
+Vector: Vec<Box<Expr>> = {
+    "[" <begin:(<Expr> ",")*> <end:Expr> "]" =>{
+        let mut vector = begin;
+
+        vector.push(end);
+        vector
+    }
+};
+
 Func: Box<Expr> = {
     <Variable> "(" <Expr> ")" => Box::new(Expr::Function(<>)),
-}
+};
 
 Variable: String = {
     r"[[:alpha:]]+[[:alnum:]]+|[A-HJ-Za-hj-z]{1}" => String::from(<>),
