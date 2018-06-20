@@ -17,6 +17,32 @@ fn add_complex_imaginary(c: (f32, f32)) -> Result<Expr, String> {
     Ok(Expr::Complex(c.0, c.1 + 1.0))
 }
 
+fn add_matrix_matrix(a: Vec<Vec<Box<Expr>>>, b: Vec<Vec<Box<Expr>>>) -> Result<Expr, String> {
+    let mut res = Vec::<Vec<Box<Expr>>>::new();
+    let mut errors = String::new();
+
+    for (y, line) in a.iter().zip(b.iter()).enumerate() {
+        let mut res_line = Vec::<Box<Expr>>::new();
+
+        for (x, value) in line.0.iter().zip(line.1.iter()).enumerate() {
+            let (left, right) = (*value.0.clone(), *value.1.clone());
+            res_line.push(match left + right {
+                Ok(a) => Box::new(a),
+                Err(s) => {
+                    errors = format!("{}\n{}", errors, s);
+                    Box::new(Expr::Number(0.0))
+                },
+            });
+        }
+        res.push(res_line);
+    }
+    if errors.is_empty() {
+        Ok(Expr::Matrix(res))
+    } else {
+        Err(errors)
+    }
+}
+
 impl Add for Expr {
     type Output = Result<Expr, String>;
 
@@ -30,6 +56,7 @@ impl Add for Expr {
                 add_number_imaginary(a),
             (Expr::Complex(ca, cb), Expr::Imaginary) | (Expr::Imaginary, Expr::Complex(ca, cb)) =>
                 add_complex_imaginary((ca, cb)),
+            (Expr::Matrix(a), Expr::Matrix(b)) => add_matrix_matrix(a, b),
             (a, b) => Err(Expr::type_error(a, b, Opcode::Add)),
         }
     }
