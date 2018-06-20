@@ -13,6 +13,32 @@ impl Solver {
         }
     }
 
+    fn reduce_matrice(&self, matrice: Vec<Vec<Box<Expr>>>) -> Result<Expr, String>{
+        let mut res = Vec::<Vec<Box<Expr>>>::new();
+        let mut errors = String::new();
+
+        for (y, line) in matrice.iter().enumerate() {
+            let mut res_line = Vec::<Box<Expr>>::new();
+
+            for (x, value) in line.iter().enumerate() {
+                let value = value.clone();
+                res_line.push(match self.solve(*value) {
+                    Ok(a) => Box::new(a),
+                    Err(s) => {
+                        errors = format!("{}\n{}", errors, s);
+                        Box::new(Expr::Number(0.0))
+                    },
+                });
+            }
+            res.push(res_line);
+        }
+        if errors.is_empty() {
+            Ok(Expr::Matrix(res))
+        } else {
+            Err(errors)
+        }
+    }
+
     fn solve(&self, expr: Expr) -> Result<Expr, String> {
         match expr {
             Expr::Number(_) => Ok(expr),
@@ -24,7 +50,7 @@ impl Solver {
                     Ok(expr)
                 }
             },
-            Expr::Matrix(_) => Ok(expr), //TODO
+            Expr::Matrix(matrice) => self.reduce_matrice(matrice),
             Expr::Variable(s) => match self.vars.get(&s.to_lowercase()).cloned() {
                 Some(value) => Ok(value),
                 None => return Err(format!("Error: Variable '{}' is undefined.", s)),
