@@ -68,6 +68,67 @@ fn div_imaginary_complex(c: (f32, f32)) -> Result<Expr, String> {
     }
 }
 
+fn div_matrix_any(a: Vec<Vec<Box<Expr>>>, b: Expr) -> Result<Expr, String> {
+    let mut res = Vec::<Vec<Box<Expr>>>::new();
+    let mut errors = String::new();
+
+    for (y, line) in a.iter().enumerate() {
+        let mut res_line = Vec::<Box<Expr>>::new();
+
+        for (x, value) in line.iter().enumerate() {
+            let left = *value.clone();
+            let right = b.clone();
+            res_line.push(match left / right {
+                Ok(a) => Box::new(a),
+                Err(s) => {
+                    errors = if errors.is_empty() {
+                        format!("{} at [{}, {}]", s, x, y)
+                    } else {
+                        format!("{}\n{} at [{}, {}]", errors, s, x, y)
+                    };
+                    Box::new(Expr::Number(0.0))
+                },
+            });
+        }
+        res.push(res_line);
+    }
+    if errors.is_empty() {
+        Ok(Expr::Matrix(res))
+    } else {
+        Err(errors)
+    }
+}
+
+fn div_matrix_matrix(a: Vec<Vec<Box<Expr>>>, b: Vec<Vec<Box<Expr>>>) -> Result<Expr, String> {
+    let mut res = Vec::<Vec<Box<Expr>>>::new();
+    let mut errors = String::new();
+
+    for (y, line) in a.iter().zip(b.iter()).enumerate() {
+        let mut res_line = Vec::<Box<Expr>>::new();
+
+        for (x, value) in line.0.iter().zip(line.1.iter()).enumerate() {
+            let (left, right) = (*value.0.clone(), *value.1.clone());
+            res_line.push(match left / right {
+                Ok(a) => Box::new(a),
+                Err(s) => {
+                    errors = if errors.is_empty() {
+                        format!("{} at [{}, {}]", s, x, y)
+                    } else {
+                        format!("{}\n{} at [{}, {}]", errors, s, x, y)
+                    };
+                    Box::new(Expr::Number(0.0))
+                },
+            });
+        }
+        res.push(res_line);
+    }
+    if errors.is_empty() {
+        Ok(Expr::Matrix(res))
+    } else {
+        Err(errors)
+    }
+}
+
 impl Div for Expr {
     type Output = Result<Expr, String>;
 
@@ -81,6 +142,10 @@ impl Div for Expr {
             (Expr::Imaginary, Expr::Number(a)) => div_imaginary_number(a),
             (Expr::Complex(ca, cb), Expr::Imaginary) => div_complex_imaginary((ca, cb)),
             (Expr::Imaginary, Expr::Complex(ca, cb)) => div_imaginary_complex((ca, cb)),
+            (Expr::Matrix(a), Expr::Number(b)) => div_matrix_any(a, Expr::Number(b)),
+            (Expr::Matrix(a), Expr::Complex(x, y)) => div_matrix_any(a, Expr::Complex(x, y)),
+            (Expr::Matrix(a), Expr::Imaginary) => div_matrix_any(a, Expr::Imaginary),
+            (Expr::Matrix(a), Expr::Matrix(b)) => div_matrix_matrix(a, b), //Kronecker div
             (a, b) => Err(Expr::type_error(a, b, Opcode::Div)),
         }
     }

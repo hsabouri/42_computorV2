@@ -1,6 +1,22 @@
 use ast::{Expr, Opcode};
 use std::ops::Mul;
 
+fn mul_number_complex(n: f32, c: (f32, f32)) -> Result<Expr, String> {
+    Ok(Expr::Complex(n * c.0, n * c.1))
+}
+
+fn mul_complex_complex(c0: (f32, f32), c1: (f32, f32)) -> Result<Expr, String> {
+    Ok(Expr::Complex(c0.0 * c1.0 - c0.1 * c1.1, c0.1 * c1.0 + c0.0 * c1.1))
+}
+
+fn mul_number_imaginary(n: f32) -> Result<Expr, String> {
+    Ok(Expr::Complex(0.0, n))
+}
+
+fn mul_complex_imaginary(c: (f32, f32)) -> Result<Expr, String> {
+    Ok(Expr::Complex(-c.1, c.0))
+}
+
 fn mul_matrix_any(a: Vec<Vec<Box<Expr>>>, b: Expr) -> Result<Expr, String> {
     let mut res = Vec::<Vec<Box<Expr>>>::new();
     let mut errors = String::new();
@@ -30,22 +46,6 @@ fn mul_matrix_any(a: Vec<Vec<Box<Expr>>>, b: Expr) -> Result<Expr, String> {
     } else {
         Err(errors)
     }
-}
-
-fn mul_number_complex(n: f32, c: (f32, f32)) -> Result<Expr, String> {
-    Ok(Expr::Complex(n * c.0, n * c.1))
-}
-
-fn mul_complex_complex(c0: (f32, f32), c1: (f32, f32)) -> Result<Expr, String> {
-    Ok(Expr::Complex(c0.0 * c1.0 - c0.1 * c1.1, c0.1 * c1.0 + c0.0 * c1.1))
-}
-
-fn mul_number_imaginary(n: f32) -> Result<Expr, String> {
-    Ok(Expr::Complex(0.0, n))
-}
-
-fn mul_complex_imaginary(c: (f32, f32)) -> Result<Expr, String> {
-    Ok(Expr::Complex(-c.1, c.0))
 }
 
 fn mul_matrix_matrix(a: Vec<Vec<Box<Expr>>>, b: Vec<Vec<Box<Expr>>>) -> Result<Expr, String> {
@@ -95,6 +95,8 @@ impl Mul for Expr {
                 mul_matrix_any(a, Expr::Number(b)),
             (Expr::Matrix(a), Expr::Complex(x, y)) | (Expr::Complex(x, y), Expr::Matrix(a)) =>
                 mul_matrix_any(a, Expr::Complex(x, y)),
+            (Expr::Matrix(a), Expr::Imaginary) | (Expr::Imaginary, Expr::Matrix(a)) =>
+                mul_matrix_any(a, Expr::Imaginary),
             (Expr::Matrix(a), Expr::Matrix(b)) => mul_matrix_matrix(a, b), //Kronecker product
             (a, b) => Err(Expr::type_error(a, b, Opcode::Mul)),
         }

@@ -16,9 +16,18 @@ impl Solver {
     fn reduce_matrice(&self, matrice: Vec<Vec<Box<Expr>>>) -> Result<Expr, String>{
         let mut res = Vec::<Vec<Box<Expr>>>::new();
         let mut errors = String::new();
+        let mut x_size: Option<usize> = None;
 
         for (y, line) in matrice.iter().enumerate() {
             let mut res_line = Vec::<Box<Expr>>::new();
+
+            x_size = match x_size {
+                Some(a) if a != line.len() =>
+                    return Err(format!("invalid dimensions\n\texpected: [{}, {}]\n\tfound: [{}, {}]",
+                                       a, matrice.len(), line.len(), matrice.len())),
+                None => Some(line.len()),
+                a => a,
+            };
 
             for (x, value) in line.iter().enumerate() {
                 let value = value.clone();
