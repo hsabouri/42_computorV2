@@ -2,6 +2,14 @@ use ast::{Expr, Opcode};
 use std::ops::Div;
 use std::f32;
 
+fn div_number_number(a: f32, b: f32) -> Result<Expr, String> {
+    if b >= 0.0 - f32::EPSILON && b <= 0.0 + f32::EPSILON {
+        Err(format!("Can't divide by 0"))
+    } else {
+        Ok(Expr::Number(a / b))
+    }
+}
+
 fn div_number_complex(a: f32, c: (f32, f32)) -> Result<Expr, String> {
     let squared = c.0 * c.0 - c.1 * c.1;
 
@@ -65,7 +73,7 @@ impl Div for Expr {
 
     fn div(self, other: Expr) -> Result<Expr, String> {
         match (self, other) {
-            (Expr::Number(a), Expr::Number(b)) => Ok(Expr::Number(a / b)),
+            (Expr::Number(a), Expr::Number(b)) => div_number_number(a, b),
             (Expr::Number(a), Expr::Complex(ca, cb)) => div_number_complex(a, (ca, cb)),
             (Expr::Complex(ca, cb), Expr::Number(a)) => div_complex_number(a, (ca, cb)),
             (Expr::Complex(c1a, c1b), Expr::Complex(c2a, c2b)) => div_complex_complex((c1a, c1b), (c2a, c2b)),
