@@ -25,7 +25,11 @@ impl Solver {
                 res_line.push(match self.solve(*value) {
                     Ok(a) => Box::new(a),
                     Err(s) => {
-                        errors = format!("{}\n{}", errors, s);
+                        errors = if errors.is_empty() {
+                            format!("{} at [{}, {}]", s, x, y)
+                        } else {
+                            format!("{}\n{} at [{}, {}]", errors, s, x, y)
+                        };
                         Box::new(Expr::Number(0.0))
                     },
                 });
@@ -63,6 +67,7 @@ impl Solver {
                 Opcode::Div => self.solve(*a)? / self.solve(*b)?,
                 Opcode::Rem => self.solve(*a)? % self.solve(*b)?,
                 Opcode::Pow => self.solve(*a)?.pow(self.solve(*b)?),
+                Opcode::Prod => self.solve(*a)?.prod(self.solve(*b)?),
             },
         }
     }

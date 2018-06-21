@@ -41,7 +41,11 @@ fn sub_matrix_matrix(a: Vec<Vec<Box<Expr>>>, b: Vec<Vec<Box<Expr>>>) -> Result<E
             res_line.push(match left - right {
                 Ok(a) => Box::new(a),
                 Err(s) => {
-                    errors = format!("{}\n{}", errors, s);
+                    errors = if errors.is_empty() {
+                        format!("{} at [{}, {}]", s, x, y)
+                    } else {
+                        format!("{}\n{} at [{}, {}]", errors, s, x, y)
+                    };
                     Box::new(Expr::Number(0.0))
                 },
             });
