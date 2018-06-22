@@ -13,6 +13,12 @@ pub trait Prod<RHS=Self> {
     fn prod(self, rhs: RHS) -> Self::Output;
 }
 
+pub trait ProdDiv<RHS=Self> {
+    type Output;
+
+    fn prod_div(self, rhs: RHS) -> Self::Output;
+}
+
 #[derive(Copy, Clone)]
 pub enum Opcode {
     Add,
@@ -22,6 +28,7 @@ pub enum Opcode {
     Rem,
     Pow,
     Prod,
+    ProdDiv,
 }
 
 impl fmt::Debug for Opcode {
@@ -33,7 +40,8 @@ impl fmt::Debug for Opcode {
             Opcode::Div => write!(f, "divide"),
             Opcode::Rem => write!(f, "modulo"),
             Opcode::Pow => write!(f, "power"),
-            Opcode::Prod => write!(f, "product"),
+            Opcode::Prod => write!(f, "matrice product"),
+            Opcode::ProdDiv => write!(f, "matrice divide"),
         }
     }
 }
@@ -48,6 +56,7 @@ impl fmt::Display for Opcode {
             Opcode::Rem => write!(f, "%"),
             Opcode::Pow => write!(f, "^"),
             Opcode::Prod => write!(f, "**"),
+            Opcode::ProdDiv => write!(f, "//"),
         }
     }
 }

@@ -8,8 +8,10 @@ mod sub_override;
 mod mul_override;
 mod div_override;
 mod rem_override;
+mod cmp_override;
 mod pow_trait;
 mod prod_trait;
+mod proddiv_trait;
 
 use solver::Solver;
 use ast::Input;

@@ -77,6 +77,7 @@ impl Solver {
                 Opcode::Rem => self.solve(*a)? % self.solve(*b)?,
                 Opcode::Pow => self.solve(*a)?.pow(self.solve(*b)?),
                 Opcode::Prod => self.solve(*a)?.prod(self.solve(*b)?),
+                Opcode::ProdDiv => self.solve(*a)?.prod_div(self.solve(*b)?),
             },
         }
     }

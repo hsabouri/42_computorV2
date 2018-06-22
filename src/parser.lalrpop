@@ -26,9 +26,10 @@ Factor: Box<Expr> = {
 
 FactorOp: Opcode = { // lvl 2
     "*" => Opcode::Mul,
-    "**" => Opcode::Prod,
     "/" => Opcode::Div,
     "%" => Opcode::Rem,
+    "**" => Opcode::Prod,
+    "//" => Opcode::ProdDiv,
 };
 
 Power: Box<Expr> = {
