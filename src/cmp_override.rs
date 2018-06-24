@@ -1,4 +1,4 @@
-use ast::{Expr, Opcode};
+use ast::Expr;
 use std::cmp::{Ordering, Eq};
 use std::f32;
 

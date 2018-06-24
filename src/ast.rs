@@ -67,7 +67,7 @@ pub enum Input {
     Eval(Box<Expr>)
 }
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub enum Expr {
     Number(f32),
     Imaginary,
@@ -85,7 +85,7 @@ impl Expr {
                 Expr::Number(_) => format!("number ({})", left),
                 Expr::Imaginary => format!("complex ({})", left),
                 Expr::Complex(_, _) => format!("complex ({})", left),
-                Expr::Matrix(_) => format!("matrice ({})", left),
+                Expr::Matrix(_) => format!("matrice ({:?})", left),
                 Expr::Variable(_) => format!("variable ({})", left),
                 Expr::Function(_, _) => format!("function ({})", left),
                 Expr::Op(_, _, _) => format!("expression ({})", left),
@@ -94,23 +94,20 @@ impl Expr {
                 Expr::Number(_) => format!("number ({})", right),
                 Expr::Imaginary => format!("complex ({})", right),
                 Expr::Complex(_, _) => format!("complex ({})", right),
-                Expr::Matrix(_) => format!("matrice ({})", right),
+                Expr::Matrix(_) => format!("matrice ({:?})", right),
                 Expr::Variable(_) => format!("variable ({})", right),
                 Expr::Function(_, _) => format!("function ({})", right),
                 Expr::Op(_, _, _) => format!("expression ({})", right),
             }
         )
     }
+}
 
-    pub fn operation_error(self, op: Opcode) -> String {
+impl fmt::Debug for Expr {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            Expr::Number(_) => format!("Can't {:?} on numbers", op),
-            Expr::Imaginary => format!("Can't {:?} on imaginary number", op),
-            Expr::Complex(_, _) => format!("Can't {:?} on complex numbers", op),
-            Expr::Matrix(_) => format!("Can't {:?} on matrices", op),
-            Expr::Variable(_) => format!("Can't {:?} on raw variables", op),
-            Expr::Function(_, _) => format!("Can't {:?} on raw functions", op),
-            Expr::Op(_, _, _) => format!("Can't {:?} on raw exprs", op),
+            Expr::Matrix(x) => write!(f, "[{}, {}]", x.len(), x[0].len()),
+            n => write!(f, "{}", n),
         }
     }
 }
