@@ -29,7 +29,6 @@ FactorOp: Opcode = { // lvl 2
     "/" => Opcode::Div,
     "%" => Opcode::Rem,
     "**" => Opcode::Prod,
-    "//" => Opcode::ProdDiv,
 };
 
 Power: Box<Expr> = {
@@ -78,7 +77,7 @@ Func: Box<Expr> = {
 };
 
 Variable: String = {
-    r"[[:alpha:]]+[[:alnum:]]+|[A-HJ-Za-hj-z]{1}" => String::from(<>),
+    r"[[:alpha:]]+[[:alnum:]]+|[A-HJ-Wa-hj-z]{1}" => String::from(<>),
 };
 
 Num: f32 = {
