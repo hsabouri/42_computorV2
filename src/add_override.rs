@@ -48,7 +48,9 @@ fn add_matrix_matrix(a: Vec<Vec<Box<Expr>>>, b: Vec<Vec<Box<Expr>>>) -> Result<E
 }
 
 fn add_reduce(a: Expr, b: Expr, c: Expr, op: Opcode) -> Result<Expr, String> {
-    Err(format!("implement add redius"))
+    match op {
+        op => Ok(Expr::Op(Box::new(Expr::Op(Box::new(a), op, Box::new(b))), Opcode::Add, Box::new(c)))
+    }
 }
 
 impl Add for Expr {
