@@ -73,7 +73,7 @@ impl Sub for Expr {
             (Expr::Complex(ca, cb), Expr::Imaginary) => sub_complex_imaginary((ca, cb)),
             (Expr::Imaginary, Expr::Complex(ca, cb)) => sub_imaginary_complex((ca, cb)),
             (Expr::Matrix(a), Expr::Matrix(b)) => sub_matrix_matrix(a, b),
-            (a, b) => Err(Expr::type_error(a, b, Opcode::Sub)),
+            (a, b) => Ok(Expr::Op(Box::new(a), Opcode::Sub, Box::new(b))),
         }
     }
 }

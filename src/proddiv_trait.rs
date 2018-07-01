@@ -24,7 +24,7 @@ impl ProdDiv for Expr {
     fn prod_div(self, other: Expr) -> Result<Expr, String> {
         match (self, other) {
             (a, Expr::Matrix(b)) => a.prod(matrice_invert(b)?),
-            (a, b) => Err(Expr::type_error(a, b, Opcode::ProdDiv)),
+            (a, b) => Ok(Expr::Op(Box::new(a), Opcode::ProdDiv, Box::new(b))),
         }
     }
 }

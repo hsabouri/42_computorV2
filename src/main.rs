@@ -1,4 +1,7 @@
+#![feature(box_patterns)]
+
 extern crate rustyline;
+extern crate snowflake;
 
 mod parser;
 mod solver;
@@ -9,18 +12,20 @@ mod mul_override;
 mod div_override;
 mod rem_override;
 mod cmp_override;
+mod fmt_override;
 mod pow_trait;
 mod prod_trait;
 mod proddiv_trait;
 
 use solver::Solver;
-use ast::Input;
+use ast::{Input, Expr};
 use rustyline::error::ReadlineError;
 use rustyline::Editor;
 
 fn parse(solver: &mut Solver, line: String) {
     match parser::EquExprParser::new().parse(&line) {
         Ok(Input::Assignation(left, right)) => match solver.assign(*left, *right) {
+            Ok(Expr::Function(name, arg)) => solver.show_function(Expr::Function(name, arg)),
             Ok(expr) => println!("{}", expr),
             Err(err) => println!("{}", err),
         },

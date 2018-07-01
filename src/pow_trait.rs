@@ -22,7 +22,7 @@ impl Pow for Expr {
         match (self, other) {
             (Expr::Number(a), Expr::Number(b)) => Ok(Expr::Number(a.powf(b))),
             (Expr::Complex(ca, cb), Expr::Number(a)) => pow_complex_number(a, Expr::Complex(ca, cb)),
-            (a, b) => Err(Expr::type_error(a, b, Opcode::Pow))
+            (a, b) => Ok(Expr::Op(Box::new(a), Opcode::Pow, Box::new(b))),
         }
     }
 }

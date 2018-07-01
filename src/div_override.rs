@@ -146,7 +146,7 @@ impl Div for Expr {
             (Expr::Matrix(a), Expr::Complex(x, y)) => div_matrix_any(a, Expr::Complex(x, y)),
             (Expr::Matrix(a), Expr::Imaginary) => div_matrix_any(a, Expr::Imaginary),
             (Expr::Matrix(a), Expr::Matrix(b)) => div_matrix_matrix(a, b), //Kronecker div
-            (a, b) => Err(Expr::type_error(a, b, Opcode::Div)),
+            (a, b) => Ok(Expr::Op(Box::new(a), Opcode::Div, Box::new(b))),
         }
     }
 }

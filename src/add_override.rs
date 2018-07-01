@@ -47,6 +47,10 @@ fn add_matrix_matrix(a: Vec<Vec<Box<Expr>>>, b: Vec<Vec<Box<Expr>>>) -> Result<E
     }
 }
 
+fn add_reduce(a: Expr, b: Expr, c: Expr, op: Opcode) -> Result<Expr, String> {
+    Err(format!("implement add redius"))
+}
+
 impl Add for Expr {
     type Output = Result<Expr, String>;
 
@@ -61,7 +65,9 @@ impl Add for Expr {
             (Expr::Complex(ca, cb), Expr::Imaginary) | (Expr::Imaginary, Expr::Complex(ca, cb)) =>
                 add_complex_imaginary((ca, cb)),
             (Expr::Matrix(a), Expr::Matrix(b)) => add_matrix_matrix(a, b),
-            (a, b) => Err(Expr::type_error(a, b, Opcode::Add)),
+            (Expr::Op(xa, opa, ya), Expr::Op(xb, opb, yb)) => Err(format!("Can't reduce Op Op")),
+            (Expr::Op(a, op, b), c) | (c, Expr::Op(a, op, b)) => add_reduce(*a, *b, c, op),
+            (a, b) => Ok(Expr::Op(Box::new(a), Opcode::Add, Box::new(b))),
         }
     }
 }

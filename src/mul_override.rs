@@ -98,7 +98,7 @@ impl Mul for Expr {
             (Expr::Matrix(a), Expr::Imaginary) | (Expr::Imaginary, Expr::Matrix(a)) =>
                 mul_matrix_any(a, Expr::Imaginary),
             (Expr::Matrix(a), Expr::Matrix(b)) => mul_matrix_matrix(a, b), //Kronecker product
-            (a, b) => Err(Expr::type_error(a, b, Opcode::Mul)),
+            (a, b) => Ok(Expr::Op(Box::new(a), Opcode::Mul, Box::new(b))),
         }
     }
 }

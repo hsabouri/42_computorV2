@@ -30,7 +30,7 @@ impl Prod for Expr {
     fn prod(self, other: Expr) -> Result<Expr, String> {
         match (self, other) {
             (Expr::Matrix(a), Expr::Matrix(b)) => prod_matrice_matrice(a, b),
-            (a, b) => Err(Expr::type_error(a, b, Opcode::Prod)),
+            (a, b) => Ok(Expr::Op(Box::new(a), Opcode::Prod, Box::new(b))),
         }
     }
 }

@@ -51,7 +51,7 @@ impl Rem for Expr {
             (Expr::Complex(c1a, c1b), Expr::Complex(c2a, c2b)) => rem_complex_complex((c1a, c1b), (c2a, c2b)),
             (Expr::Complex(ca, cb), Expr::Imaginary) => rem_complex_imaginary((ca, cb)),
             (Expr::Imaginary, Expr::Complex(ca, cb)) => rem_imaginary_complex((ca, cb)),
-            (a, b) => Err(Expr::type_error(a, b, Opcode::Rem)),
+            (a, b) => Ok(Expr::Op(Box::new(a), Opcode::Rem, Box::new(b))),
         }
     }
 }
