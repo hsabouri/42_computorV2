@@ -12,7 +12,7 @@ fn pow_complex_number(n: f32, c: Expr) -> Result<Expr, String> {
             res = (res / c.clone())?;
         }
     }
-	Ok(res)
+    Ok(res)
 }
 
 impl Pow for Expr {

@@ -1,5 +1,6 @@
 use ast::{Expr, Opcode};
 use std::ops::Mul;
+use mul_reduce::{mul_reduce_simple};
 
 fn mul_number_complex(n: f32, c: (f32, f32)) -> Result<Expr, String> {
     Ok(Expr::Complex(n * c.0, n * c.1))
@@ -98,6 +99,8 @@ impl Mul for Expr {
             (Expr::Matrix(a), Expr::Imaginary) | (Expr::Imaginary, Expr::Matrix(a)) =>
                 mul_matrix_any(a, Expr::Imaginary),
             (Expr::Matrix(a), Expr::Matrix(b)) => mul_matrix_matrix(a, b), //Kronecker product
+            (Expr::Op(xa, opa, ya), Expr::Op(xb, opb, yb)) => Err(format!("Can't reduce Op Op")),
+            (Expr::Op(a, op, b), c) | (c, Expr::Op(a, op, b)) => mul_reduce_simple(*a, *b, c, op),
             (a, b) => Ok(Expr::Op(Box::new(a), Opcode::Mul, Box::new(b))),
         }
     }

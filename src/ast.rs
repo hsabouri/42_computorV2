@@ -1,5 +1,4 @@
 use std::f32;
-use std::fmt;
 
 pub trait Pow<RHS=Self> {
     type Output;
@@ -37,6 +36,22 @@ pub enum Input {
     Eval(Box<Expr>)
 }
 
+pub enum AbstractType {
+    Computable(Expr),
+    Litteral(Expr),
+    Matrix(Expr),
+}
+
+impl AbstractType {
+    pub fn get_expr(self) -> Expr {
+        match self {
+            AbstractType::Computable(e) |
+            AbstractType::Litteral(e) |
+            AbstractType::Matrix(e) => e
+        }
+    }
+}
+
 #[derive(Clone)]
 pub enum Expr {
     Number(f32),
@@ -70,5 +85,17 @@ impl Expr {
                 Expr::Op(_, _, _) => format!("expression ({})", right),
             }
         )
+    }
+
+    pub fn get_abstract_type(self) -> AbstractType {
+        match self {
+            Expr::Number(a) => AbstractType::Computable(Expr::Number(a)),
+            Expr::Complex(a, b) => AbstractType::Computable(Expr::Complex(a, b)),
+            Expr::Imaginary => AbstractType::Computable(Expr::Imaginary),
+            Expr::Variable(s) => AbstractType::Litteral(Expr::Variable(s)),
+            Expr::Function(s, a) => AbstractType::Litteral(Expr::Function(s, a)),
+            Expr::Matrix(v) => AbstractType::Matrix(Expr::Matrix(v)),
+            a => AbstractType::Litteral(a)
+        }
     }
 }

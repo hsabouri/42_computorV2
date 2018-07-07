@@ -1,5 +1,6 @@
 use ast::{Expr, Opcode};
 use std::ops::Add;
+use add_reduce::{add_reduce_simple};
 
 fn add_number_complex(n: f32, c: (f32, f32)) -> Result<Expr, String> {
     Ok(Expr::Complex(n + c.0, c.1))
@@ -47,12 +48,6 @@ fn add_matrix_matrix(a: Vec<Vec<Box<Expr>>>, b: Vec<Vec<Box<Expr>>>) -> Result<E
     }
 }
 
-fn add_reduce(a: Expr, b: Expr, c: Expr, op: Opcode) -> Result<Expr, String> {
-    match op {
-        op => Ok(Expr::Op(Box::new(Expr::Op(Box::new(a), op, Box::new(b))), Opcode::Add, Box::new(c)))
-    }
-}
-
 impl Add for Expr {
     type Output = Result<Expr, String>;
 
@@ -68,7 +63,7 @@ impl Add for Expr {
                 add_complex_imaginary((ca, cb)),
             (Expr::Matrix(a), Expr::Matrix(b)) => add_matrix_matrix(a, b),
             (Expr::Op(xa, opa, ya), Expr::Op(xb, opb, yb)) => Err(format!("Can't reduce Op Op")),
-            (Expr::Op(a, op, b), c) | (c, Expr::Op(a, op, b)) => add_reduce(*a, *b, c, op),
+            (Expr::Op(a, op, b), c) | (c, Expr::Op(a, op, b)) => add_reduce_simple(*a, *b, c, op),
             (a, b) => Ok(Expr::Op(Box::new(a), Opcode::Add, Box::new(b))),
         }
     }

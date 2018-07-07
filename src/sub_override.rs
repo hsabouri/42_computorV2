@@ -1,5 +1,6 @@
 use ast::{Expr, Opcode};
 use std::ops::Sub;
+use sub_reduce::{sub_reduce_simple};
 
 fn sub_number_complex(n: f32, c: (f32, f32)) -> Result<Expr, String> {
     Ok(Expr::Complex(n - c.0, -c.1))
@@ -73,6 +74,8 @@ impl Sub for Expr {
             (Expr::Complex(ca, cb), Expr::Imaginary) => sub_complex_imaginary((ca, cb)),
             (Expr::Imaginary, Expr::Complex(ca, cb)) => sub_imaginary_complex((ca, cb)),
             (Expr::Matrix(a), Expr::Matrix(b)) => sub_matrix_matrix(a, b),
+            (Expr::Op(xa, opa, ya), Expr::Op(xb, opb, yb)) => Err(format!("Can't reduce Op Op")),
+            (Expr::Op(a, op, b), c) | (c, Expr::Op(a, op, b)) => sub_reduce_simple(*a, *b, c, op),
             (a, b) => Ok(Expr::Op(Box::new(a), Opcode::Sub, Box::new(b))),
         }
     }
