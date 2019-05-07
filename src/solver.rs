@@ -104,7 +104,7 @@ impl Solver {
     fn handle_variable(&self, s: String) -> Result<Expr, String> {
         match self.vars.get(&s.to_lowercase()).cloned() {
             Some(value) => Ok(value),
-            None => Err(format!("Error: Variable '{}' is undefined.", s)),
+            None => Ok(Expr::Variable(s)),
         }
     }
 
